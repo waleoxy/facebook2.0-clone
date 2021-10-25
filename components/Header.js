@@ -15,10 +15,14 @@ import{
     SearchIcon,
 } from '@heroicons/react/outline';
 import HeaderIcon from './HeaderIcon';
+import {useSession} from "next-auth/client"
 
 function Header() {
+    const [session] = useSession();
+
     return (
-        <div className>
+        <div className="sticky top-0 z-50 bg-white flex items-center p-2
+        lg:px-5 shadow-md">
             <div className="flex items-center">
                <Image 
                   alt="logo"
@@ -29,7 +33,8 @@ function Header() {
                <div className="flex items-center ml-3 rounded-full bg-gray-100 p-2">
                   <SearchIcon className="h-6 text-gray-600 rounded-full"/>
                   <input 
-                    className="flex ml-2 items-center bg-transparent outline-none"
+                    className="hidden md:inline-flex ml-2 items-center bg-transparent outline-none
+                    placeholder-gray-500 flex-shrink"
                     type="text"
                     placeholder="Seach Facebook"
 
@@ -38,18 +43,28 @@ function Header() {
                </div>
             </div>
             <div className="flex justify-center flex-grow">
-              <div className="flex space-x-2 md:space-x-6 lg:space-x-12"> 
-                <HeaderIcon Icon={HomeIcon}/>
+              <div className="flex space-x-6 md: space-x-2 "> 
+                <HeaderIcon isActive Icon={HomeIcon}/>
                 <HeaderIcon Icon={FlagIcon}/>
                 <HeaderIcon Icon={PlayIcon}/>
                 <HeaderIcon Icon={ShoppingCartIcon}/>
                 <HeaderIcon Icon={UserGroupIcon}/>
              </div>
             </div>
-            <div>
-           
+            <div className="flex items-center sm:space-x-2 justify-end">
+                <Image 
+                  alt="profile pix"
+                  src={session.user.image}
+                  width={40} height={40}
+                  layout="fixed" 
+               />
+                <p className="whitespace-nowrap font-semibold pr-3">{session.user.name}</p>            </div>
+                <ViewGridIcon className="icon"/>
+                <ChatIcon className="icon"/>
+                <BellIcon className="icon"/>
+                <ChevronDownIcon className="icon"/>
+                
             </div>
-        </div>
     )
 }
 
