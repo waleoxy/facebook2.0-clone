@@ -15,7 +15,7 @@ import{
     SearchIcon,
 } from '@heroicons/react/outline';
 import HeaderIcon from './HeaderIcon';
-import {useSession} from "next-auth/client"
+import {signOut, useSession} from "next-auth/client"
 
 function Header() {
     const [session] = useSession();
@@ -52,7 +52,9 @@ function Header() {
              </div>
             </div>
             <div className="flex items-center sm:space-x-2 justify-end">
-                <Image 
+                <Image
+                  onClick ={signOut}
+                  className="rounded-full cursor-pointer"
                   alt="profile pix"
                   src={session.user.image}
                   width={40} height={40}
