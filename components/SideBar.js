@@ -8,7 +8,7 @@ function SideBar() {
     const [session, loading] = useSession();
 
     return (
-        <div className="ml-3 xl: max-w-[300px] hover:overflow-y-scroll">
+        <div className="ml-3 w-[300px] xl: max-w-[550px] hover:overflow-y-scroll">
             <div className="p-2 inline-flex w-full mt-5 space-x-2
                 cursor-pointer items-center hover:bg-gray-200">
                 <Image

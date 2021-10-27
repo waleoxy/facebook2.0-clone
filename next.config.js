@@ -3,7 +3,8 @@ module.exports = {
   images:{
     domains:[
       "www.teahub.io",
-      "platform-lookaside.fbsbx.com"
+      "platform-lookaside.fbsbx.com",
+      "randomuser.me"
     ],
 
   },

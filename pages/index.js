@@ -1,5 +1,6 @@
 import { getSession } from 'next-auth/client'
 import Head from 'next/head'
+import Feed from '../components/Feed'
 import Header from '../components/Header'
 import Login from '../components/Login'
 import SideBar from '../components/SideBar'
@@ -7,16 +8,16 @@ import SideBar from '../components/SideBar'
 export default function Home({session}) {
 
   if (!session) return <Login/>
- 
- console.log('ss', session);
+
   return (
-    <div>
+    <div className="h-screen bg-gray-100 overflow-hidden">
       <Head>
         <title>Facebook</title>
      </Head>
      <Header/>
-     <main>
+     <main className="flex">
        <SideBar/>
+       <Feed/>
      </main>
     </div>
   )
@@ -24,7 +25,6 @@ export default function Home({session}) {
 
 export async function getServerSideProps(context){
   const session = await getSession(context);
-   console.log('ss', session);
   return{
     props: {
       session,
