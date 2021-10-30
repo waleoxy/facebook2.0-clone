@@ -1,13 +1,27 @@
 import { getSession } from 'next-auth/client'
 import Head from 'next/head'
+import { useState } from 'react'
 import Feed from '../components/Feed'
 import Header from '../components/Header'
 import Login from '../components/Login'
+import Modal from '../components/Modal'
 import SideBar from '../components/SideBar'
 
 export default function Home({session}) {
+  
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  if (!session) return <Login/>
+  if (!session) {return <Login/>}
+
+  console.log('cl', isModalOpen);
+
+  const openModal = () => {
+    setIsModalOpen(true)   
+}
+ const closeModal = () => {
+    setIsModalOpen(false) 
+}
+  
 
   return (
     <div className="h-screen bg-gray-100 overflow-hidden">
@@ -15,10 +29,18 @@ export default function Home({session}) {
         <title>Facebook</title>
      </Head>
      <Header/>
-     <main className="flex">
-       <SideBar/>
-       <Feed/>
-     </main>
+     <section className="relative">
+      <main className="flex">
+        <SideBar/>
+        <Feed click={openModal}/>
+      </main>
+      {isModalOpen &&
+     <div className="w-2/5 absolute top-16 left-1/3 
+            rounded-2xl right-1/3 bg-white pb-3">
+        <Modal clickClose={closeModal}/>
+      </div>
+      }
+     </section>
     </div>
   )
 }
