@@ -4,7 +4,7 @@ import {useSession} from "next-auth/client";
 import {EmojiHappyIcon} from "@heroicons/react/outline";
 import {CameraIcon, VideoCameraIcon} from "@heroicons/react/solid"
 
-function InputBox({click}) {
+function InputBox({click, addModalInsert}) {
     const[session] = useSession();
 
     return (
@@ -38,7 +38,7 @@ function InputBox({click}) {
                         Live Video
                     </p>
                 </div>
-                <div className="inputIcon">
+                <div onClick={addModalInsert} className="inputIcon">
                      <CameraIcon className="h-7 text-green-400
                     "/>
                     <p className="text-xs sm:text-sm

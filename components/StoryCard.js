@@ -17,7 +17,7 @@ function StoryCard({image, name, profilePic}) {
             />
             <Image
                 className="object-cover rounded-full
-                filter brightness-75 lg:rounded-3xl" 
+                filter brightness-75 lg:rounded-xl" 
                 src={image}
                 alt="pix"
                 layout="fill"

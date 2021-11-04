@@ -10,16 +10,20 @@ import SideBar from '../components/SideBar'
 export default function Home({session}) {
   
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isWithInsert, setIsWithInsert] = useState(false)
 
   if (!session) {return <Login/>}
-
-  console.log('cl', isModalOpen);
 
   const openModal = () => {
     setIsModalOpen(true)   
 }
  const closeModal = () => {
-    setIsModalOpen(false) 
+    setIsModalOpen(false)
+    setIsWithInsert(false)
+}
+ const addModalInsert = () => {
+    setIsWithInsert(true) 
+    setIsModalOpen(true)  
 }
   
 
@@ -32,12 +36,12 @@ export default function Home({session}) {
      <section className="relative">
       <main className="flex">
         <SideBar/>
-        <Feed click={openModal}/>
+        <Feed addModalInsert={addModalInsert} click={openModal}/>
       </main>
       {isModalOpen &&
-     <div className="w-2/5 absolute top-16 left-1/3 
+     <div className="w-2/5 absolute top-4 left-1/3 
             rounded-2xl right-1/3 bg-white pb-3">
-        <Modal clickClose={closeModal}/>
+        <Modal clickClose={closeModal} isWithInsert={isWithInsert}/>
       </div>
       }
      </section>

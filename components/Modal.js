@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {useSession} from "next-auth/client";
 import Image from "next/image"
 import {VideoCameraIcon} from "@heroicons/react/solid"
@@ -9,26 +9,61 @@ import { ColorSwatchIcon, DotsHorizontalIcon,
          EmojiHappyIcon, XIcon 
         } from '@heroicons/react/outline';
 
-function Modal({clickClose}) {
+import  db  from '../firebase';
+import { collection, serverTimestamp, addDoc } from "firebase/firestore";
+import PixInsertModal from './PixInsertModal';
+
+function Modal({clickClose, isWithInsert}) {
     const[session] = useSession()
     const [postOpen, setPostOpen] = useState(false)
-    
+    const [myPost, setMyPost] = useState('');
+    const filePickeRef = useRef(null);
+    const [pixIoPost, setPixIoPost] = useState(null)
+  
 
-    const handleChange = (e) => {
-        e.preventDefault();
-        let post = e.target.value
+    const handleChange = (event) => {
+        event.preventDefault();
+        let post = event.target.value
+        setMyPost(post)
         if(post.length > 0){
             setPostOpen(true)
         }else{
             setPostOpen(false)
         }
     }
-    const handleModalClose = () => {
+    console.log('post', myPost);
+    const sendPost = async (event) => {
+            if(myPost.length > 0){
+            
+            event.preventDefault();
+            const docRef = await addDoc(collection(db, "posts"), {
+            message: myPost,
+            name: session.user.name,
+            email: session.user.email,
+            image: session.user.image,
+            timestamp: serverTimestamp()
+    
+        });
+        setMyPost('')
+        console.log("Document written with ID: ", docRef.id);
+    }else{
+        return
+    }
+}
 
+    const addPixToPost = (event) =>{
+        const fileReader = new FileReader();
+        if(event.target.files[0]){
+            fileReader.readAsDataURL(event.target.files[0])
+        }
+        fileReader.onload = (readerEvent) => {
+            setPixIoPost(readerEvent.target.result)
+        }
     }
 
     return (
-        <div className=" flex flex-col justify-center">
+        <div className="flex flex-col justify-center ">
+
             <div className="inline-flex items-center justify-center py-2
              text-xl border-b">
               <p className="ml-52 font-bold ">Create posts</p>
@@ -63,24 +98,35 @@ function Modal({clickClose}) {
                         </div>
                     </div>
               </div>
-              <textarea
-                onChange={handleChange}
-                rows="4"
-                className="h-max text-2xl flex flex-1 p-2 focus:outline-none overflow-y-hidden"
-                placeholder={`What's on your mind ${session.user.name}?`}/>
+              <form onSubmit={sendPost}>
+                  <div className="flex flex-col h-56 overflow-y-scroll">
+                    <textarea
+                        onChange={handleChange}
+                        type="text"
+                        value={myPost}
+                        className="resize-y w-full h-auto text-2xl flex flex-grow p-2 focus:outline-none overflow-y-hidden"
+                        placeholder={`What's on your mind ${session.user.name}?`}>
+                    </textarea>
+                     {(isWithInsert) ?
+                        <PixInsertModal addPixToPost={addPixToPost} pixToPost={pixIoPost}/> : 
+                        <div className="flex items-center justify-between mt-4 pl-4 text-gray-400">
+                        <div><ColorSwatchIcon className="h-7 pr-3"/></div>
+                        <diV><EmojiHappyIcon className="h-7 pr-3"/></diV>
+                    </div>
+                    }
+                    
+                </div>
               
-              <div className="flex items-center justify-between mt-4 pl-4 text-gray-400">
-                  <div><ColorSwatchIcon className="h-7 pr-3"/></div>
-                  <diV><EmojiHappyIcon className="h-7 pr-3"/></diV>
-              </div>
-              
-              <div className="flex items-center justify-between
-               p-4 h-13 mx-3 bg-white mt-4 border-2">
+                <div className="flex items-center justify-between
+                    p-4 h-13 mx-3 bg-white mt-4 border-2">
                   <div className="cursor-pointer">
                       <p>Add to your post</p>
                   </div>
                   <div className="flex space-x-3 pr-4 justify-evenly text-gray-500 h-7">
-                      <PhotographIcon  className="text-green-700 cursor-pointer"/>
+                      <div onClick={() => filePickeRef.current.click()}>
+                        <PhotographIcon className="h-7 text-green-700 cursor-pointer"/>
+                        <input hidden ref={filePickeRef} onChange={addPixToPost} type="file"/>
+                      </div>
                       <UserAddIcon className="text-blue-700 cursor-pointer"/>
                       <EmojiHappyIcon className="text-yellow-400 cursor-pointer"/>
                       <LocationMarkerIcon className="text-red-500 cursor-pointer"/>
@@ -90,8 +136,9 @@ function Modal({clickClose}) {
               </div>
               <div className={`p-2 mt-4 text-center mx-3 ${(postOpen) ? `bg-blue-700` : `bg-gray-200`}
                 text-gray-400 `}>
-                 <button>Post</button>
+                 <button type="submit">Post</button>
               </div>
+            </form>
             </div>
     )
 }
