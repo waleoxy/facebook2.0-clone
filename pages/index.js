@@ -6,6 +6,7 @@ import Header from '../components/Header'
 import Login from '../components/Login'
 import Modal from '../components/Modal'
 import SideBar from '../components/SideBar'
+import Widgets from '../components/Widgets'
 
 export default function Home({session}) {
   
@@ -37,6 +38,7 @@ export default function Home({session}) {
       <main className="flex">
         <SideBar/>
         <Feed addModalInsert={addModalInsert} click={openModal}/>
+        <Widgets/>
       </main>
       {isModalOpen &&
      <div className="w-2/5 absolute top-4 left-1/3 
