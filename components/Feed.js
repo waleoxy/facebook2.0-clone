@@ -1,5 +1,6 @@
 import React from 'react'
 import InputBox from './InputBox'
+import Posts from './Posts'
 import Stories from './Stories'
 
 function Feed({click, addModalInsert}) {
@@ -10,6 +11,7 @@ function Feed({click, addModalInsert}) {
             lg:max-w-2xl">
                 <Stories/>
                 <InputBox addModalInsert={addModalInsert} click={click}/>
+                <Posts/>
             </div>
         </div>
     )

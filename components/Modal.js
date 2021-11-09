@@ -9,15 +9,16 @@ import { ColorSwatchIcon, DotsHorizontalIcon,
          EmojiHappyIcon, XIcon 
         } from '@heroicons/react/outline';
 
-import  db  from '../firebase';
-import { collection, serverTimestamp, addDoc } from "firebase/firestore";
+import {db, storage}   from '../firebase';
+import { collection, serverTimestamp, addDoc, doc, setDoc } from "firebase/firestore";
 import PixInsertModal from './PixInsertModal';
+import { uploadString, ref, getDownloadURL } from '@firebase/storage';
 
 function Modal({clickClose, isWithInsert}) {
     const[session] = useSession()
     const [postOpen, setPostOpen] = useState(false)
     const [myPost, setMyPost] = useState('');
-    const filePickeRef = useRef(null);
+    const filePickerRef = useRef(null);
     const [pixIoPost, setPixIoPost] = useState(null)
   
 
@@ -36,16 +37,37 @@ function Modal({clickClose, isWithInsert}) {
             if(myPost.length > 0){
             
             event.preventDefault();
-            const docRef = await addDoc(collection(db, "posts"), {
+            await addDoc(collection(db, "posts"), {
             message: myPost,
             name: session.user.name,
             email: session.user.email,
             image: session.user.image,
             timestamp: serverTimestamp()
     
-        });
+        }).then(docId => {
+            if(pixIoPost){
+                const storageRef = ref(storage, `posts/${docId.id}`);
+                const uploadTask = uploadString(storageRef, pixIoPost, 'data_url');
+               
+                removePix();
+
+                uploadTask.then(
+                    function() {
+                    console.log('upload complete!');
+                      getDownloadURL(storageRef).then((downloadURL) => {
+                    console.log('File available at', downloadURL);
+
+                    const postRef = doc(db, 'posts', docId.id );
+                    setDoc(postRef, { postPix: downloadURL }, { merge: true });
+                    });
+                    });
+
+                
+            }
+            
+        })
         setMyPost('')
-        console.log("Document written with ID: ", docRef.id);
+        
     }else{
         return
     }
@@ -59,6 +81,10 @@ function Modal({clickClose, isWithInsert}) {
         fileReader.onload = (readerEvent) => {
             setPixIoPost(readerEvent.target.result)
         }
+    }
+
+    const removePix = () =>{
+            setPixIoPost(null)
     }
 
     return (
@@ -99,16 +125,25 @@ function Modal({clickClose, isWithInsert}) {
                     </div>
               </div>
               <form onSubmit={sendPost}>
-                  <div className="flex flex-col h-56 overflow-y-scroll">
+                  <div className="flex flex-col max-h-64 overflow-y-scroll overflow-x-hidden">
                     <textarea
                         onChange={handleChange}
                         type="text"
+                        rows="3"
                         value={myPost}
                         className="resize-y w-full h-auto text-2xl flex flex-grow p-2 focus:outline-none overflow-y-hidden"
                         placeholder={`What's on your mind ${session.user.name}?`}>
                     </textarea>
                      {(isWithInsert) ?
-                        <PixInsertModal addPixToPost={addPixToPost} pixToPost={pixIoPost}/> : 
+                        <div>
+                         <textarea
+                            onChange={handleChange}
+                            type="text"
+                            value={myPost}
+                            className="resize-y w-full text-lg mx-5 flex focus:outline-none"
+                            placeholder={`What's on your mind ${session.user.name}?`}>
+                        </textarea>
+                        <PixInsertModal addPixToPost={addPixToPost} pixToPost={pixIoPost}/> </div> : 
                         <div className="flex items-center justify-between mt-4 pl-4 text-gray-400">
                         <div><ColorSwatchIcon className="h-7 pr-3"/></div>
                         <diV><EmojiHappyIcon className="h-7 pr-3"/></diV>
@@ -123,9 +158,9 @@ function Modal({clickClose, isWithInsert}) {
                       <p>Add to your post</p>
                   </div>
                   <div className="flex space-x-3 pr-4 justify-evenly text-gray-500 h-7">
-                      <div onClick={() => filePickeRef.current.click()}>
+                      <div onClick={() => filePickerRef.current.click()}>
                         <PhotographIcon className="h-7 text-green-700 cursor-pointer"/>
-                        <input hidden ref={filePickeRef} onChange={addPixToPost} type="file"/>
+                        <input hidden ref={filePickerRef} onChange={addPixToPost} type="file"/>
                       </div>
                       <UserAddIcon className="text-blue-700 cursor-pointer"/>
                       <EmojiHappyIcon className="text-yellow-400 cursor-pointer"/>

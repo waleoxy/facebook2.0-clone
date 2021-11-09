@@ -1,19 +1,26 @@
 import { DeviceMobileIcon, PlusCircleIcon } from '@heroicons/react/outline'
-import React from 'react'
+import React, { useRef } from 'react'
 
 function PixInsertModal({pixToPost, addPixToPost}) {
+
+    const filePickerRef = useRef(null)
+
     return (
         <div  className="bg-white mx-5 border-2 rounded-lg " >
         <div className="bg-gray-100 hover:bg-gray-200 cursor-pointer
         relative rounded-lg m-3 h-44 text-xl text-gray-500">
-            <div className="">
-                {(pixToPost) && <image src={pixToPost} alt="pix"/>}                  
-            </div>
-            <div onClick={addPixToPost} className="absolute flex flex-col justify-center
+            {(pixToPost)? 
+            <img className="object-contain w-full" src={pixToPost} alt="pix"/>
+            :
+            <div onClick={() => filePickerRef.current.click()} className="absolute flex flex-col justify-center
             items-center w-full top-8">
+                <input hidden ref={filePickerRef} onChange={addPixToPost} type="file"/>
                 <PlusCircleIcon className="h-9"/>
                 <p>Add Photo/Video</p>
             </div>
+        
+            }
+            
         </div>
         <div className="flex justify-between items-center bg-gray-100 rounded-lg m-3 h-14 text-xl text-gray-500">
             <div className="flex items-center">
