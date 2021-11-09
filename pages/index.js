@@ -37,6 +37,7 @@ export default function Home({session}) {
       <main className="flex">
         <SideBar/>
         <Feed addModalInsert={addModalInsert} click={openModal}/>
+        <Widgets/>
       </main>
       {isModalOpen &&
      <div className="w-2/5 absolute top-4 left-1/3 
